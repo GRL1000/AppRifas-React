@@ -9,6 +9,7 @@ import DialogContent from '@mui/material/DialogContent';
 import { Bounce } from "react-awesome-reveal";
 import Button from '@mui/material/Button';
 import error from '../assets/error.png';
+import errorConn from '../assets/lost-connection.png';
 
 function LoginComponent({isTokenValid}) {
   const [isSignUpMode, setIsSignInUpMode] = useState(false);
@@ -21,6 +22,11 @@ function LoginComponent({isTokenValid}) {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const handleCloseErrorModal = () => setShowErrorModal(false);
+
+  //Error de conexión
+  const [showErrorCModal, setShowCErrorModal] = useState(false);
+  const [errorCMessage, setErrorCMessage] = useState('');
+  const handleCloseCErrorModal = () => setShowCErrorModal(false);
 
   const toggleMode = () => {
     setIsSignInUpMode(!isSignUpMode);
@@ -45,6 +51,17 @@ function LoginComponent({isTokenValid}) {
       }
     } catch (error) {
       console.error("Error al iniciar sesión: ", error);
+  
+      if (error.response) {
+        setErrorMessage("Credenciales incorrectas. Por favor, inténtelo de nuevo.");
+        setShowErrorModal(true);
+      } else if (error.request) {
+        setErrorCMessage("Error de conexión. Por favor, comprueba tu conexión a Internet.");
+        setShowCErrorModal(true);
+      } else {
+        setErrorMessage("Credenciales incorrectas. Por favor, inténtelo de nuevo.");
+        setShowErrorModal(true);
+      }
     }
   };
   
@@ -163,6 +180,21 @@ function LoginComponent({isTokenValid}) {
         <img src={error} alt="Error" style={{ width: '100px', height: '100px', marginTop: '20px' }} />
         <p style={{ fontSize: '20px', paddingTop: '20px', paddingBottom: '20px' }}>{errorMessage}</p>
         <Button variant="contained" color="primary" onClick={handleCloseErrorModal}>
+          OK
+        </Button>
+      </DialogContent>
+    </Dialog>
+
+    <Dialog open={showErrorCModal} onClose={handleCloseCErrorModal} TransitionComponent={Bounce}
+      PaperProps={{
+        style: {
+        marginTop: '15.5%',
+      }
+    }}>
+      <DialogContent style={{ textAlign: 'center', width: '450px', height: '320px'}}>
+        <img src={errorConn} alt="Error" style={{ width: '100px', height: '100px', marginTop: '20px' }} />
+        <p style={{ fontSize: '20px', paddingTop: '20px', paddingBottom: '20px' }}>{errorCMessage}</p>
+        <Button variant="contained" color="primary" onClick={handleCloseCErrorModal}>
           OK
         </Button>
       </DialogContent>
