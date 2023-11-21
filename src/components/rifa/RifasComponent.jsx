@@ -8,6 +8,7 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import { useNavigate, Link } from "react-router-dom";
 import exit from '../../assets/exit.png';
 import { Slide, Zoom, Bounce, Flip, Rotate, JackInTheBox } from "react-awesome-reveal";
 
@@ -22,12 +23,23 @@ function RifasComponent() {
   const handleCloseConfirmationModal = () => setShowConfirmationModal(false);
   const handleShowConfirmationModal = () => setShowConfirmationModal(true);
 
-  const [token, setToken] = React.useState(null);
+  const navigate = useNavigate();
 
-  const isTokenValid = () => {
-    setToken(localStorage.getItem('secure_token'));
-    return token !== null && token !== undefined;
-  }
+  const handleRowClick = (params) => {
+    console.log("ID: " + params.row.id);
+    console.log("Nombre: " + params.row.nombre); //se toman de colums - fields
+    console.log("Descripción: " + params.row.descripcion);
+    console.log("Fecha inicio: " + params.row.fecha_inicio);
+    console.log("Fecha fin: " + params.row.fecha_fin);
+    console.log("Costo: " + params.row.costo);
+    console.log("Número de boletos: " + params.row.num_boletos);
+    console.log("Activa: " + params.row.activa);
+    navigate("/boletos", {
+      state: {
+        id: params.row.id,
+      },
+    });
+  };
 
   const columns = [
     {
@@ -96,12 +108,12 @@ function RifasComponent() {
         <div>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Button variant="contained" startIcon={<EditIcon style={{ color: 'black' }} />}
-              onClick={() => handleUpdate(params.id)}
+              onClick={(event) => handleUpdate(params.id, event)}
               style={{backgroundColor: '#FFC107', paddingRight: '5px', marginRight: '5px' }}
             ></Button>
 
             <Button variant="contained" startIcon={<DeleteIcon />}
-              onClick={() => handleOpenDeleteDialog(params.id)}
+              onClick={(event) => handleOpenDeleteDialog(params.id, event)}
               style={{backgroundColor:'#C82333', paddingRight:'5px'}}
             ></Button>
           </div>
@@ -124,7 +136,8 @@ function RifasComponent() {
     }
   };
 
-  const handleUpdate = (id) => {
+  const handleUpdate = (id, event) => {
+    event.stopPropagation();
     const selectedRifa = rows.find((row) => row.id === id);
     setSelectedRifaData(selectedRifa);
     setUpdateDialogOpen(true);
@@ -162,7 +175,8 @@ function RifasComponent() {
     }
   };
   
-  const handleOpenDeleteDialog = (id) => {
+  const handleOpenDeleteDialog = (id, event) => {
+    event.stopPropagation();
     setSelectedRifaId(id);
     setDeleteDialogOpen(true);
   };
@@ -177,7 +191,7 @@ function RifasComponent() {
 
   return (
     <div style={{ height: 400, width: "100%" }}>
-      <DataGrid rows={rows} columns={columns} pageSizeOptions={[5, 10]} />
+      <DataGrid rows={rows} columns={columns} pageSizeOptions={[5, 10]} onRowClick={handleRowClick} />
       
       <Dialog
         open={updateDialogOpen}

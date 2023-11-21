@@ -3,6 +3,7 @@ import LoginComponent from "./components/LoginComponent";
 import HomeComponent from "./components/HomeComponent";
 import NuevaRifaComponent from './components/rifa/NuevaRifaComponent';
 import React, { useEffect } from 'react';
+import BoletosComponent from './components/boletos/BoletosComponent';
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<LoginComponent isTokenValid={isTokenValid}/>} />
         <Route path="/home" element={ token ? (<HomeComponent />) : (<Navigate to="/" />)} />
         <Route path="/rifa/nueva" element={<NuevaRifaComponent/>}/>
+        <Route path="/boletos" element={<BoletosComponent/>} />
       </Routes>
     </Router>
   );
