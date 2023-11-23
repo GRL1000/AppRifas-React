@@ -2,6 +2,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Button from '@mui/material/Button';
+import { IconButton } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Dialog from '@mui/material/Dialog';
@@ -11,10 +12,13 @@ import DialogActions from '@mui/material/DialogActions';
 import { useNavigate, Link } from "react-router-dom";
 import exit from '../../assets/exit.png';
 import { Slide, Zoom, Bounce, Flip, Rotate, JackInTheBox } from "react-awesome-reveal";
+import AvisoPrivacidadComponent from '../AvisoPrivacidadComponent';
+import logout from '../../assets/cerrar-sesion.png';
 
 function RifasComponent() {
   const [rows, setRows] = React.useState([]);
   const [error, setError] = useState(null);
+  const [avisoPrivacidadOpen, setAvisoPrivacidadOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedRifaId, setSelectedRifaId] = React.useState(null);
   const [updateDialogOpen, setUpdateDialogOpen] = React.useState(false);
@@ -134,6 +138,14 @@ function RifasComponent() {
       console.error("Error al obtener las rifas: ", error);
       setError("Error al obtener las rifas. ");
     }
+  };
+
+  const handleShowAvisoPrivacidad = () => {
+    setAvisoPrivacidadOpen(true);
+  };
+
+  const handleCloseAvisoPrivacidad = () => {
+    setAvisoPrivacidadOpen(false);
   };
 
   const handleUpdate = (id, event) => {
@@ -328,6 +340,31 @@ function RifasComponent() {
         </Button>
       </DialogContent>
     </Dialog>
+
+    {/* Agrega un nuevo botón o trigger para mostrar el aviso de privacidad */}
+    <Button variant="contained" style={{marginTop: '10px'}} onClick={handleShowAvisoPrivacidad}>
+        Mostrar Aviso de Privacidad
+      </Button>
+
+      <IconButton style={{marginTop: '10px', marginLeft: '955px'}} onClick={""}>
+        <img src={logout} alt="Cerrar Sesión" style={{width: '50px'}}/>
+      </IconButton>
+
+      <Dialog
+        open={avisoPrivacidadOpen}
+        onClose={handleCloseAvisoPrivacidad}
+      >
+        <DialogTitle>Aviso de Privacidad</DialogTitle>
+        <DialogContent>
+          {/* Renderiza el componente de aviso de privacidad */}
+          <AvisoPrivacidadComponent handleClose={handleCloseAvisoPrivacidad} />
+        </DialogContent>
+        <DialogActions>
+          <Button variant="contained" onClick={handleCloseAvisoPrivacidad} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
