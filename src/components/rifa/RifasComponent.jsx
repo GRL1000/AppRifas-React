@@ -14,10 +14,11 @@ import exit from '../../assets/exit.png';
 import { Slide, Zoom, Bounce, Flip, Rotate, JackInTheBox } from "react-awesome-reveal";
 import AvisoPrivacidadComponent from '../AvisoPrivacidadComponent';
 import logout from '../../assets/cerrar-sesion.png';
+import LoadingScreenComponent from "../LoadingScreenComponent";
 
 function RifasComponent() {
   const [rows, setRows] = React.useState([]);
-  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [avisoPrivacidadOpen, setAvisoPrivacidadOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [selectedRifaId, setSelectedRifaId] = React.useState(null);
@@ -171,7 +172,6 @@ function RifasComponent() {
     }
   };
 
-  // Eliminar rifa
   const handleDelete = async () => {
     const id = selectedRifaId;
     try {
@@ -201,8 +201,21 @@ function RifasComponent() {
     fnRifas();
   }, []);
 
+  const handleLogout = async () => {
+    setIsLoading(true);
+
+    // Simula un tiempo de carga para mostrar el Loading Screen
+    setTimeout(() => {
+      // Limpia el token y redirige a la página de inicio
+      localStorage.removeItem("secure_token");
+      navigate("/");
+    }, 2000); // Ajusta el tiempo según tus necesidades
+  };
+
   return (
     <div style={{ height: 400, width: "100%" }}>
+              {isLoading && <LoadingScreenComponent/>}
+
       <DataGrid rows={rows} columns={columns} pageSizeOptions={[5, 10]} onRowClick={handleRowClick} />
       
       <Dialog
@@ -341,14 +354,15 @@ function RifasComponent() {
       </DialogContent>
     </Dialog>
 
-    {/* Agrega un nuevo botón o trigger para mostrar el aviso de privacidad */}
     <Button variant="contained" style={{marginTop: '10px'}} onClick={handleShowAvisoPrivacidad}>
         Mostrar Aviso de Privacidad
       </Button>
 
-      <IconButton style={{marginTop: '10px', marginLeft: '955px'}} onClick={""}>
-        <img src={logout} alt="Cerrar Sesión" style={{width: '50px'}}/>
-      </IconButton>
+      <div>
+        <IconButton style={{marginTop: '10px', marginLeft: '955px'}} onClick={handleLogout}>
+          <img src={logout} alt="Cerrar Sesión" style={{width: '50px'}} />
+        </IconButton>
+      </div>
 
       <Dialog
         open={avisoPrivacidadOpen}
@@ -356,7 +370,6 @@ function RifasComponent() {
       >
         <DialogTitle>Aviso de Privacidad</DialogTitle>
         <DialogContent>
-          {/* Renderiza el componente de aviso de privacidad */}
           <AvisoPrivacidadComponent handleClose={handleCloseAvisoPrivacidad} />
         </DialogContent>
         <DialogActions>
