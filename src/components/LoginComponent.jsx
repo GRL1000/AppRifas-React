@@ -10,9 +10,11 @@ import { Bounce } from "react-awesome-reveal";
 import Button from '@mui/material/Button';
 import error from '../assets/error.png';
 import errorConn from '../assets/lost-connection.png';
+import LoadingScreenComponent from './LoadingScreenComponent';
 
 function LoginComponent({isTokenValid}) {
   const [isSignUpMode, setIsSignInUpMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPasssword] = useState('');
   const [emailError, setEmailError] = useState('');
@@ -36,21 +38,30 @@ function LoginComponent({isTokenValid}) {
   const fnLogin = async (e) => {
     e.preventDefault();
 
-    // Validar campos
-    const validationErrors = {};
+    setEmailError('');
+    setPasswordError('');
+    setIsLoading(true);
 
-    // Validar el email con una expresión regular
+    const validationErrors =  {}
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     if (!username.trim() || !emailRegex.test(username)) {
       setEmailError('El campo Usuario debe ser un email válido');
+      setIsLoading(false);
       return;
     }
 
-      // Validar longitud mínima de la contraseña
-  if (password.trim().length < 8) {
-    setPasswordError('La contraseña debe tener al menos 8 caracteres');
-    return;
-  }
+    if (!password.trim()) {
+      validationErrors.password = 'El campo Contraseña es requerido';
+      setIsLoading(false);
+    }
+
+    if (password.trim().length < 8) {
+      setPasswordError('La contraseña debe tener al menos 8 caracteres');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post("http://127.0.0.1:8000/api/login", {
@@ -79,13 +90,18 @@ function LoginComponent({isTokenValid}) {
         setErrorMessage("Credenciales incorrectas. Por favor, inténtelo de nuevo.");
         setShowErrorModal(true);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   
 
   return (
     <div>
-      <div className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}>
+      {isLoading ? (
+        <LoadingScreenComponent />
+      ) : (
+        <div className={`container ${isSignUpMode ? "sign-up-mode" : ""}`}>
           <div className="forms-container">
               <div className="signin-signup">
                   <form className="sign-in-form">
@@ -199,36 +215,42 @@ function LoginComponent({isTokenValid}) {
               </div>
           </div>
       </div>
+      )}
       <Dialog open={showErrorModal} onClose={handleCloseErrorModal} TransitionComponent={Bounce}
       PaperProps={{
         style: {
         marginTop: '15.5%',
-      }
-    }}>
-      <DialogContent style={{ textAlign: 'center', width: '450px', height: '320px'}}>
-        <img src={error} alt="Error" style={{ width: '100px', height: '100px', marginTop: '20px' }} />
-        <p style={{ fontSize: '20px', paddingTop: '20px', paddingBottom: '20px' }}>{errorMessage}</p>
-        <Button variant="contained" color="primary" onClick={handleCloseErrorModal}>
-          OK
-        </Button>
-      </DialogContent>
-    </Dialog>
+        }
+      }}>
+        <DialogContent style={{ textAlign: 'center', width: '450px', height: '320px'}}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <img src={error} alt="Error" style={{ width: '100px', height: '100px', marginTop: '20px' }} />
+            <p style={{ fontSize: '20px', paddingTop: '20px', paddingBottom: '20px' }}>{errorMessage}</p>
+          </div>
+          <Button variant="contained" color="primary" onClick={handleCloseErrorModal}>
+            OK
+          </Button>
+        </DialogContent>
+      </Dialog>
 
-    <Dialog open={showErrorCModal} onClose={handleCloseCErrorModal} TransitionComponent={Bounce}
+      <Dialog open={showErrorCModal} onClose={handleCloseCErrorModal} TransitionComponent={Bounce}
       PaperProps={{
         style: {
         marginTop: '15.5%',
       }
-    }}>
-      <DialogContent style={{ textAlign: 'center', width: '450px', height: '320px'}}>
-        <img src={errorConn} alt="Error" style={{ width: '100px', height: '100px', marginTop: '20px' }} />
-        <p style={{ fontSize: '20px', paddingTop: '20px', paddingBottom: '20px' }}>{errorCMessage}</p>
-        <Button variant="contained" color="primary" onClick={handleCloseCErrorModal}>
-          OK
-        </Button>
-      </DialogContent>
-    </Dialog>
-   </div>
+      }}>
+
+        <DialogContent style={{ textAlign: 'center', width: '450px', height: '320px'}}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <img src={errorConn} alt="Error" style={{ width: '100px', height: '100px', marginTop: '20px' }} />
+            <p style={{ fontSize: '20px', paddingTop: '20px', paddingBottom: '20px' }}>{errorCMessage}</p>
+          </div>
+          <Button variant="contained" color="primary" onClick={handleCloseCErrorModal}>
+            OK
+          </Button>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
 
