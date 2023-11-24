@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
 import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import DialogActions from '@mui/material/DialogActions';
-import { Bounce } from "react-awesome-reveal";
-import exit from '../../assets/exit.png';
 import Button from '@mui/material/Button';
+import axios from "axios";
+import exit from '../../assets/exit.png';
 
 function BoletosComponent() {
   const location = useLocation();
@@ -16,10 +13,7 @@ function BoletosComponent() {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const handleCloseConfirmationModal = () => setShowConfirmationModal(false);
   const handleShowConfirmationModal = () => setShowConfirmationModal(true);
-
-  const handleMostrarBoletosClick = () => {
-    setMostrarBoletos(!mostrarBoletos);
-  };
+  const [modalClosed, setModalClosed] = useState(false);
 
   const [rifa, setRifa] = useState({
     id: 0,
@@ -31,19 +25,6 @@ function BoletosComponent() {
     num_boletos: 0,
     activa: "",
   });
-
-  const handleBoletoClick = (numeroBoleto) => {
-    setBoletos((prevBoletos) => {
-      const boletoIndex = prevBoletos.indexOf(numeroBoleto);
-      if (boletoIndex !== -1) {
-        // Si el boleto ya está marcado, lo desmarcamos
-        return [...prevBoletos.slice(0, boletoIndex), ...prevBoletos.slice(boletoIndex + 1)];
-      } else {
-        // Si el boleto no está marcado, lo marcamos
-        return [...prevBoletos, numeroBoleto];
-      }
-    });
-  };
 
   const fnObtenerDatos = async () => {
     await axios
@@ -66,23 +47,47 @@ function BoletosComponent() {
     }
   }, []);
 
+  const handleMostrarBoletosClick = () => {
+    setMostrarBoletos(!mostrarBoletos);
+  };
+
   const renderBotonesBoletos = () => {
     const botones = [];
 
     for (let i = 1; i <= rifa.num_boletos; i++) {
       const isBoletoMarcado = boletos.includes(i);
+
       botones.push(
         <button
-        className={`bg-blue-500 hover:bg-green-700 focus:outline-none text-white font-bold py-2 px-4 rounded-full mr-2 mb-2 ${isBoletoMarcado ? 'bg-green-500' : ''}`}
-        key={i}
-        onClick={() => handleBoletoClick(i)}
-      >
-        {i}
-      </button>
+          className={`bg-blue-500 hover:bg-green-700 focus:outline-none text-white font-bold py-2 px-4 rounded-full mr-2 mb-2 ${
+            isBoletoMarcado ? "bg-green-500" : ""
+          }`}
+          key={i}
+          onClick={() => handleBoletoClick(i)}
+          style={{ transition: "background-color 0.3s" }}
+        >
+          {i}
+        </button>
       );
     }
 
     return botones;
+  };
+
+  const handleBoletoClick = (numeroBoleto) => {
+    setBoletos((prevBoletos) => {
+      const boletoIndex = prevBoletos.indexOf(numeroBoleto);
+      if (boletoIndex !== -1) {
+        // Si el boleto ya está marcado, lo desmarcamos
+        return [
+          ...prevBoletos.slice(0, boletoIndex),
+          ...prevBoletos.slice(boletoIndex + 1),
+        ];
+      } else {
+        // Si el boleto no está marcado, lo marcamos
+        return [...prevBoletos, numeroBoleto];
+      }
+    });
   };
 
   return (
@@ -120,24 +125,28 @@ function BoletosComponent() {
       {mostrarBoletos && (
         <div className="flex flex-wrap justify-center mt-4">
           {renderBotonesBoletos()}
-      </div>
+        </div>
       )}
+
       <div className="flex flex-wrap justify-center mt-4">
       {boletos.length > 0 && (
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full mx-2 my-2"
-            onClick={() => handleShowConfirmationModal()}
-          >
-            Apartar Boletos
-          </button>
-        )}
+        <button
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full mx-auto mt-4"
+          onClick={() => handleShowConfirmationModal()}
+        >
+          Apartar Boletos
+        </button>
+      )}
       </div>
-      <Dialog open={showConfirmationModal} onClose={handleCloseConfirmationModal} TransitionComponent={Bounce}
+<Dialog
+      open={showConfirmationModal}
+      onClose={handleCloseConfirmationModal}
       PaperProps={{
         style: {
-          marginTop: '15.5%',
+          marginTop: '15%',
         }
-      }}>
+      }}
+    >
       <DialogContent style={{ textAlign: 'center' }}>
         <img src={exit} alt="Éxito" style={{ width: '100px', height: '100px', marginTop: '20px' }} />
         <p style={{ fontSize: '20px', paddingTop: '20px', paddingBottom: '20px' }}>¡Operación realizada con éxito!</p>
@@ -146,7 +155,7 @@ function BoletosComponent() {
             <li key={boleto}>{boleto}</li>
           ))}
         </ul>
-        <Button variant="contained" color="primary" onClick={handleCloseConfirmationModal}>
+        <Button variant="contained" color="primary" onClick={() => handleCloseConfirmationModal()}>
           OK
         </Button>
       </DialogContent>

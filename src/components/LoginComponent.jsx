@@ -13,9 +13,10 @@ import errorConn from '../assets/lost-connection.png';
 
 function LoginComponent({isTokenValid}) {
   const [isSignUpMode, setIsSignInUpMode] = useState(false);
-
   const [username, setUsername] = useState('');
   const [password, setPasssword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
 
   //Error de credenciales
@@ -34,7 +35,23 @@ function LoginComponent({isTokenValid}) {
 
   const fnLogin = async (e) => {
     e.preventDefault();
-  
+
+    // Validar campos
+    const validationErrors = {};
+
+    // Validar el email con una expresión regular
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!username.trim() || !emailRegex.test(username)) {
+      setEmailError('El campo Usuario debe ser un email válido');
+      return;
+    }
+
+      // Validar longitud mínima de la contraseña
+  if (password.trim().length < 8) {
+    setPasswordError('La contraseña debe tener al menos 8 caracteres');
+    return;
+  }
+
     try {
       const response = await axios.post("http://127.0.0.1:8000/api/login", {
         email: username,
@@ -74,14 +91,26 @@ function LoginComponent({isTokenValid}) {
                   <form className="sign-in-form">
                   <h2 className="title">Inicia Sesión</h2>
 
-                  <div className="input-field">
-                      <i className="fas fa-user"></i>
-                      <input type="text" placeholder="Usuario" value={username} onChange={(e) => setUsername(e.target.value)}/>
+                  <div className="input-field" style={{ position: 'relative' }}>
+                    <i className="fas fa-user"></i>
+                    <input type="text" placeholder="Usuario" value={username} onChange={(e) => {setUsername(e.target.value);
+                    setEmailError(''); }} />
+                    {emailError && (
+                      <p className="error-message" style={{ position: 'absolute', top: '-15px', fontSize: '12px', color: 'red' }}>
+                        {emailError}
+                      </p>
+                    )}
                   </div>
 
                   <div className="input-field">
-                      <i className="fas fa-lock"></i>
-                      <input type="password" placeholder="Contraseña" value={password} onChange={(e) => setPasssword(e.target.value)}/>
+                    <i className="fas fa-lock"></i>
+                      <input type="password" placeholder="Contraseña" value={password} onChange={(e) => {setPasssword(e.target.value);
+                      setPasswordError(''); }} />
+                      {passwordError && (
+                      <p className="error-message" style={{ position: 'absolute', top: '-15px', fontSize: '12px', color: 'red' }}>
+                        {passwordError}
+                      </p>
+                    )}
                   </div>
 
                   <input type="submit" value="ingresar" className="btn solid" onClick={fnLogin} />
