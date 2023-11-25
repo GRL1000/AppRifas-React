@@ -359,7 +359,7 @@ function RifasComponent() {
       </Button>
 
       <div>
-        <IconButton style={{marginTop: '10px', marginLeft: '955px'}} onClick={handleLogout}>
+        <IconButton style={{marginTop: '-40px', marginLeft: '1200px'}} onClick={handleLogout}>
           <img src={logout} alt="Cerrar Sesión" style={{width: '50px'}} />
         </IconButton>
       </div>
